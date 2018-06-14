@@ -1,17 +1,16 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  labels:
-    io.kompose.service: tba-nifi
   name: tba-nifi
 spec:
+  selector:
+    matchLabels:
+      app: tba-nifi
   replicas: 1
-  strategy:
-    type: Recreate
   template:
     metadata:
       labels:
-        io.kompose.service: tba-nifi
+        app: tba-nifi
     spec:
       hostAliases:
       - ip: "192.168.0.23"
@@ -34,10 +33,10 @@ spec:
         hostnames:
           - "slave4.platform.daf.gov.it"
           - "slave4"
-      - ip: "192.168.0.26"
+      - ip: "192.168.0.55"
         hostnames:
-          - "slave4.platform.daf.gov.it"
-          - "slave4"
+          - "slave5.platform.daf.gov.it"
+          - "slave5"
       - ip: "192.168.0.20"
         hostnames:
           - "edge1.platform.daf.gov.it"
@@ -50,6 +49,14 @@ spec:
         hostnames:
           - "edge3.platform.daf.gov.it"
           - "edge3"
+      - ip: "192.168.0.53"
+        hostnames:
+          - "edge4.platform.daf.gov.it"
+          - "edge4"
+      - ip: "192.168.0.54"
+        hostnames:
+          - "edge5.platform.daf.gov.it"
+          - "edge5"
       - ip: "192.168.0.29"
         hostnames:
           - "idm.daf.gov.it"
@@ -61,17 +68,16 @@ spec:
       hostNetwork: false #replaced to true to remove service exposed
       dnsPolicy: ClusterFirstWithHostNet
       containers:
-      - image: 10.98.74.120:5000/tba-nifi.1.4.0:1.1.0
+      - image: nexus.daf.teamdigitale.it/tba-nifi.1.4.0:1.1.1-SNAPSHOT
         name: tba-nifi
         imagePullPolicy: IfNotPresent
-        lifecycle:
-          postStart:
-            exec:
-             command: ["/bin/sh", "-c", " echo \"nameserver 10.96.0.10\n$(cat /etc/resolv.conf)\" > /etc/resolv.conf"]
+        # lifecycle:
+        #   postStart:
+        #     exec:
+        #      command: ["/bin/sh", "-c", " echo \"nameserver 10.96.0.10\n$(cat /etc/resolv.conf)\" > /etc/resolv.conf"]
         ports:
         - containerPort: 8080
         - containerPort: 8033 # To test basic templates inside nifi
-        resources: {}
         volumeMounts:
         - name: glusterfsvol
           mountPath: /usr/nifi/data
@@ -181,8 +187,7 @@ spec:
       - name: home
         hostPath:
           path: /home
-      imagePullSecrets:
-      - name: regsecret
+      # nodeSelector:
+      #   kubernetes.io/hostname: edge1.platform.daf.gov.it
       nodeSelector:
-        kubernetes.io/hostname: edge1.platform.daf.gov.it
-status: {}
+        nifi: "true"

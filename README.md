@@ -23,8 +23,17 @@ brew tap caskroom/cask
 brew update
 brew install kubectl rpm make git
 ```
+For Ubuntu
+```
+sudo apt install kubectl rpm make git
+```
 
 In order to be able to build most of Docker images kylo code will be required (source and compiled). To get this run:
+
+```
+make clean
+```
+to cleanup the build
 
 ```
 make daf-kylo
@@ -34,12 +43,12 @@ make build-kylo
 
 This will use `Makefile` to download the code and compile it.
 
-### Build Docker images of the components
+### Build Docker images of the components and push to the private registry
 Once this is completed build every image:
 
 ```
 make activemq
-make elasticsearch
+# make elasticsearch # not linked anymore
 make mysql
 make kylo-services
 make kylo-ui
@@ -47,6 +56,8 @@ make nifi
 ```
 This will use `Makefile` to download the basic empty images and build our custom docker images with required tagging.
 
+TO_REMOVE
+--------
 
 ### Push Docker images to local artifactory repository
 Please ensure previously configuration of docker client as well as correct tagging the image has been performed. 'How to' can be found in:
@@ -59,6 +70,9 @@ for instance:
   ```
   docker push nexus.default.svc.cluster.local:5000/tba-kylo-services.8.4.0:1.0.0
   ```
+
+TO_REMOVE
+--------
 
 ### Deploy components in kubernetes cluster
 Please ensure previously configuration of kubectl has been done. 'How to' can be found in: [TeamDigitale onboarding , 'Setup Kubernetes'](https://docs.google.com/document/d/1KqeaZ2yj7rofslqzklYTCLb3AxPnV1mzOgSXOuTHTyw/edit?ts=59faf23f&pli=1#heading=h.vvi8emze7m35)
@@ -121,6 +135,12 @@ kubectl apply -f config-map/kylo-ui.yaml
 ```
 
 As pointed out above, once this is done *ldap login* will be substituted by *default login* , this will allow to log in with default user `dladmin/thinkbig`. This has to be done to create users with the same name that those exist in ldap in order to grant them permissions (same functionality but for groups [is currently being fixed by R&D](https://kylo-io.atlassian.net/browse/KYLO-496)) . Once user/s (or group/s) is/are created change back `config-map/kylo-services.yaml` and `config-map/kylo-ui.yaml` and redeploy again. Ldap is now good to go.
+
+## Log configuration
+
+## Custom Processors
+
+[Here](./nifi/extensions/processors/Readme.md) you can find additional information about custom processors created for the [DAF](https://teamdigitale.governo.it/it/projects/daf.htm).
 
 # Licensing
 

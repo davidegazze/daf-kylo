@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.dreamhead.moco.HttpServer;
 import com.github.dreamhead.moco.Runner;
 import it.gov.daf.nifi.processors.DafPreStandardization;
-import it.gov.daf.nifi.processors.models.Transformations;
+import it.gov.daf.nifi.processors.IngestionFlow;
 import org.apache.nifi.flowfile.FlowFile;
 import org.apache.nifi.processor.ProcessSession;
 import org.apache.nifi.util.TestRunner;
@@ -82,18 +82,52 @@ public class TestPreStandardization {
             assertThat(sParamaters.length(), notNullValue());
 
             ObjectMapper mapper = new ObjectMapper();
-            final Transformations transformations = mapper.readValue(sParamaters, Transformations.class);
+            final IngestionFlow dataTransformation = mapper.readValue(sParamaters, IngestionFlow.class);
 
-            transformations.getTransformationSteps().forEach(System.out::println);
-
-            assertThat(transformations.getTransformationSteps().size(), is(6));
-
+            dataTransformation.getSteps().forEach(System.out::println);
+            assertThat(dataTransformation.getSteps().size(), is(5));
 
         } finally {
             runner.stop();
         }
+    }
 
+    @Test
+    public void testCatalogWorkingMovimentTuristici() throws IOException, URISyntaxException {
+        final URI uri = getClass().getResource("/json/movimenti-turistici.json").toURI();
+        String body = new String(Files.readAllBytes(Paths.get(uri)));
 
+        HttpServer server = httpServer(9000);
+        server.response(body);
+        Runner runner = runner(server);
+        runner.start();
+
+        try {
+            final TestRunner testRunner =
+                    createRunner("http://localhost:9000/", "test", "test", "test");
+
+            ProcessSession session = testRunner.getProcessSessionFactory().createSession();
+            FlowFile ff = session.create();
+            testRunner.enqueue(ff);
+            testRunner.run();
+
+            testRunner.assertTransferCount(DafPreStandardization.REL_SUCCESS, 1);
+
+            final String sParamaters = testRunner.getFlowFilesForRelationship(DafPreStandardization.REL_SUCCESS)
+                    .get(0)
+                    .getAttribute(DafPreStandardization.OUTPUT_JOB_PARAMS);
+            log.info("the sParamaters are {}", sParamaters);
+            assertThat(sParamaters.length(), notNullValue());
+
+            ObjectMapper mapper = new ObjectMapper();
+            final IngestionFlow dataTransformation = mapper.readValue(sParamaters, IngestionFlow.class);
+
+            dataTransformation.getSteps().forEach(System.out::println);
+            assertThat(dataTransformation.getSteps().size(), is(5));
+
+        } finally {
+            runner.stop();
+        }
     }
 
 }
