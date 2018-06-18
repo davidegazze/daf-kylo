@@ -21,7 +21,7 @@
 ```
 brew tap caskroom/cask
 brew update
-brew install kubectl rpm make git
+brew install kubectl rpm make git maven
 ```
 For Ubuntu
 ```
