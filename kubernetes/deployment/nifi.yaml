@@ -68,7 +68,7 @@ spec:
       hostNetwork: false #replaced to true to remove service exposed
       dnsPolicy: ClusterFirstWithHostNet
       containers:
-      - image: nexus.daf.teamdigitale.it/tba-nifi.1.4.0:1.1.1-SNAPSHOT
+      - image: nexus.daf.teamdigitale.it/tba-nifi.1.6.0:1.1.1-SNAPSHOT
         name: tba-nifi
         imagePullPolicy: IfNotPresent
         # lifecycle:
