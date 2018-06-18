@@ -21,7 +21,7 @@
 ```
 brew tap caskroom/cask
 brew update
-brew install kubectl rpm make git
+brew install kubectl rpm make git maven
 ```
 
 In order to be able to build most of Docker images kylo code will be required (source and compiled). To get this run:

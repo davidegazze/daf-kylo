@@ -1,32 +1,83 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  labels:
-    io.kompose.service: tba-kylo-services
   name: tba-kylo-services
 spec:
+  selector:
+    matchLabels:
+      app: tba-kylo-services
   replicas: 1
-  strategy:
-    type: Recreate
   template:
     metadata:
       labels:
-        io.kompose.service: tba-kylo-services
+        app: tba-kylo-services
     spec:
-      hostNetwork: true
-      dnsPolicy: ClusterFirstWithHostNet
+      hostAliases:
+      - ip: "192.168.0.23"
+        hostnames:
+          - "master.platform.daf.gov.it"
+          - "master"
+      - ip: "192.168.0.22"
+        hostnames:
+          - "slave1.platform.daf.gov.it"
+          - "slave1"
+      - ip: "192.168.0.24"
+        hostnames:
+          - "slave2.platform.daf.gov.it"
+          - "slave2"
+      - ip: "192.168.0.36"
+        hostnames:
+          - "slave3.platform.daf.gov.it"
+          - "slave3"
+      - ip: "192.168.0.26"
+        hostnames:
+          - "slave4.platform.daf.gov.it"
+          - "slave4"
+      - ip: "192.168.0.55"
+        hostnames:
+          - "slave5.platform.daf.gov.it"
+          - "slave5"
+      - ip: "192.168.0.20"
+        hostnames:
+          - "edge1.platform.daf.gov.it"
+          - "edge1"
+      - ip: "192.168.0.21"
+        hostnames:
+          - "edge2.platform.daf.gov.it"
+          - "edge2"
+      - ip: "192.168.0.27"
+        hostnames:
+          - "edge3.platform.daf.gov.it"
+          - "edge3"
+      - ip: "192.168.0.53"
+        hostnames:
+          - "edge4.platform.daf.gov.it"
+          - "edge4"
+      - ip: "192.168.0.54"
+        hostnames:
+          - "edge5.platform.daf.gov.it"
+          - "edge5"
+      - ip: "192.168.0.29"
+        hostnames:
+          - "idm.daf.gov.it"
+          - "idm"
+      - ip: "192.168.0.43"
+        hostnames:
+          - "master.elasticsearch.daf.gov.it"
+          - "master"
+      hostNetwork: false #replaced to true to remove service exposed
       containers:
-      - image: 10.98.74.120:5000/tba-kylo-services.8.4:1.1.0
+      - image: nexus.daf.teamdigitale.it/tba-kylo-services.8.4:1.1.0
         name: tba-kylo-services
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8420
-        resources: {}
         volumeMounts:
         - mountPath: /opt/kylo/kylo-services/conf
           name: kylo-services-config
-        - mountPath: /opt/kylo/kylo-services/spark-shell
-          name: kylo-services-spark
+        # commented by Fabio and asked to Davide it looks is not used
+        # - mountPath: /opt/kylo/kylo-services/spark-shell
+        #   name: kylo-services-spark
         - name: glusterfsvol
           mountPath: /var/log/kylo-services
           subPath: tba/evergreen2/kylo-services/log
@@ -43,32 +94,31 @@ spec:
         - name: alternatives
           mountPath: /etc/alternatives/
           readOnly: true
-        - name: hosts
-          mountPath: /etc/extra_hosts
-          readOnly: true
+        # - name: hosts
+        #   mountPath: /etc/extra_hosts
+        #   readOnly: true
         - name: krb5conf
           mountPath: /etc/krb5.conf
           readOnly: true
         - name: hadoop
           mountPath: /etc/hadoop
           readOnly: true
-        #- name: daf-root-ca
-        #  mountPath: /etc/ssl/certs
+        # - name: daf-root-ca
+        #   mountPath: /etc/ssl/certs
       restartPolicy: Always
       volumes:
       - name: glusterfsvol
         persistentVolumeClaim:
           claimName: gluster-claim
-
       - name: kylo-services-config
         configMap:
           name: kylo-services
-      - name: kylo-services-spark
-        configMap:
-          name: kylo-services-spark
-      - name: hosts
-        hostPath:
-          path: /etc/hosts
+      # - name: kylo-services-spark
+      #   configMap:
+      #     name: kylo-services-spark
+      # - name: hosts
+      #   hostPath:
+      #     path: /etc/hosts
       - name: krb5conf
         hostPath:
           path: /etc/krb5.conf
@@ -84,10 +134,5 @@ spec:
       - name: sparkconf
         hostPath:
           path: /etc/spark2/
-
-     # - name: daf-root-ca
-     #   secret:
-     #     secretName: daf-root-ca
-      imagePullSecrets:
-      - name: regsecret
-status: {}
+      nodeSelector:
+        nifi: "true"
