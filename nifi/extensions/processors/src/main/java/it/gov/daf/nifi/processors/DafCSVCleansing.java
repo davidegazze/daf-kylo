@@ -43,41 +43,41 @@ public class DafCSVCleansing extends AbstractProcessor {
 
     // Relationships
     public static final Relationship REL_SUCCESS = new Relationship.Builder()
-        .name("success")
-        .description("Successful result.")
-        .build();
+            .name("success")
+            .description("Successful result.")
+            .build();
 
     public static final Relationship REL_FAILURE = new Relationship.Builder()
-        .name("failure")
-        .description("Error in the CSV file")
-        .build();
+            .name("failure")
+            .description("Error in the CSV file")
+            .build();
 
     public static final PropertyDescriptor SEPARATOR_CHAR = new PropertyDescriptor.Builder()
-        .name("Separator Char")
-        .description("The CSV Separator Char")
-        .required(true)
-        .defaultValue(",")
-        .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
-        .expressionLanguageSupported(true)
-        .build();
+            .name("Separator Char")
+            .description("The CSV Separator Char")
+            .required(true)
+            .defaultValue(",")
+            .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
+            .expressionLanguageSupported(true)
+            .build();
 
     public static final PropertyDescriptor QUOTE_CHAR = new PropertyDescriptor.Builder()
-        .name("Quote Char")
-        .description("The CSV Quote Char")
-        .required(true)
-        .defaultValue("\"")
-        .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
-        .expressionLanguageSupported(true)
-        .build();
+            .name("Quote Char")
+            .description("The CSV Quote Char")
+            .required(true)
+            .defaultValue("\"")
+            .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
+            .expressionLanguageSupported(true)
+            .build();
 
     public static final PropertyDescriptor ESCAPE_CHAR = new PropertyDescriptor.Builder()
-        .name("Escape Char")
-        .description("The CSV Escape Char")
-        .required(true)
-        .defaultValue("\\")
-        .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
-        .expressionLanguageSupported(true)
-        .build();
+            .name("Escape Char")
+            .description("The CSV Escape Char")
+            .required(true)
+            .defaultValue("\\")
+            .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
+            .expressionLanguageSupported(true)
+            .build();
 
     private final Set<Relationship> relationships;
 
